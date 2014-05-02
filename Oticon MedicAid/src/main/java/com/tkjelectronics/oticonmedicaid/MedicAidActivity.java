@@ -1,9 +1,7 @@
 package com.tkjelectronics.oticonmedicaid;
 
 import android.app.Activity;
-import android.content.ContentUris;
-import android.content.Intent;
-import android.net.Uri;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v4.app.Fragment;
@@ -16,12 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
-
-import java.util.Calendar;
 
 
 public class MedicAidActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+    private static final String TAG = "MedicAidActivity";
+    public static final boolean D = BuildConfig.DEBUG; // This is automatically set when building
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -33,7 +30,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
      */
     private CharSequence mTitle;
 
-    //private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver();
+    private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +42,15 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-        //registerReceiver(mCalendarReminderReceiver, new IntentFilter("android.intent.action.EVENT_REMINDER"));
+        IntentFilter filter = new IntentFilter(CalendarContract.ACTION_EVENT_REMINDER);
+        filter.addDataScheme("content");
+        registerReceiver(mCalendarReminderReceiver, filter);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //unregisterReceiver(mCalendarReminderReceiver);
+        unregisterReceiver(mCalendarReminderReceiver);
     }
 
     @Override
@@ -114,35 +113,9 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_settings)
             return true;
-        }
         return super.onOptionsItemSelected(item);
-    }
-
-    public static class CalendarFragment extends Fragment {
-        CalendarView calendarView;
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.fragment_calendar, container, false);
-            calendarView = (CalendarView) view.findViewById(R.id.calendar);
-            calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-                @Override
-                public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(year, month, dayOfMonth);
-
-                    Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
-                    builder.appendPath("time");
-                    ContentUris.appendId(builder, calendar.getTimeInMillis());
-                    Intent intent = new Intent(Intent.ACTION_VIEW)
-                            .setData(builder.build());
-                    startActivity(intent);
-                }
-            });
-            return view;
-        }
     }
 
     /**
@@ -181,15 +154,4 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
             ((MedicAidActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
-/*
-    public class CalendarReminderReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equalsIgnoreCase(CalendarContract.ACTION_EVENT_REMINDER) && getResultCode() == Activity.RESULT_OK) {
-                //Do Something Here to get EVENT ID
-                intent.getExtras()
-            }
-        }
-    }
-*/
 }
