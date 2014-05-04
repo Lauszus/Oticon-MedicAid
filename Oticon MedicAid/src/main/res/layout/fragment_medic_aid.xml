@@ -8,8 +8,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.tkjelectronics.oticonmedicaid.MedicAidActivity$PlaceholderFragment">
 
+    <Button
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:text="@string/button"
+        android:id="@+id/button"
+        android:background="@drawable/round_button"
+        android:layout_centerInParent="true" />
+
     <TextView
-        android:id="@+id/section_label"
+        android:paddingTop="10dp"
+        android:id="@+id/reminderText"
+        android:layout_below="@+id/button"
+        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
