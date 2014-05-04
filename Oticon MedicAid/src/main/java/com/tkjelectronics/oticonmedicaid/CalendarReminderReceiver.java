@@ -1,6 +1,7 @@
 package com.tkjelectronics.oticonmedicaid;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -16,40 +17,61 @@ public class CalendarReminderReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction() != null && intent.getAction().equalsIgnoreCase(CalendarContract.ACTION_EVENT_REMINDER)) {
-            Uri uri = intent.getData(); // See: https://github.com/android/platform_frameworks_base/blob/master/core/java/android/provider/CalendarContract.java#L2393
-            if (uri == null)
+            Uri uri = intent.getData(); // See: https://github.com/android/platform_frameworks_base/blob/master/core/java/android/provider/CalendarContract.java#L2393-L2394
+            if (uri == null || intent.getExtras() == null)
                 return;
 
-            if (D)
-                Log.i(TAG, "URI: " + uri.toString() + " " + ContentUris.parseId(uri));
+            long alarmTime = intent.getExtras().getLong(CalendarContract.CalendarAlerts.ALARM_TIME);
 
-            long begin = ContentUris.parseId(uri) - 60 * 1000; // Starting time in milliseconds
-            long end = ContentUris.parseId(uri) + 60 * 1000; // Ending time in milliseconds
-            String[] projection = new String[]{
+            if (D)
+                Log.i(TAG, "URI: " + uri.toString() + " " + alarmTime);
+
+            String[] instanceProj = new String[]{
                     CalendarContract.Instances._ID,
                     CalendarContract.Instances.BEGIN,
                     CalendarContract.Instances.END,
-                    CalendarContract.Instances.EVENT_ID
+                    CalendarContract.Instances.EVENT_ID,
             };
-            Cursor cursor = CalendarContract.Instances.query(context.getContentResolver(), projection, begin, end);
+            String[] reminderProj = new String[]{
+                    CalendarContract.Reminders.EVENT_ID,
+                    CalendarContract.Reminders.MINUTES,
+                    CalendarContract.Reminders.METHOD,
+            };
+
+            ContentResolver cr = context.getContentResolver();
+            Cursor instanceCursor = CalendarContract.Instances.query(cr, instanceProj, alarmTime - 12 * 60 * 60 * 1000, alarmTime + 12 * 60 * 60 * 1000); // Search for event from 12 hour before and after alarm time
 
             String eventID = "";
-            if (cursor.moveToFirst()) {
-                // TOOD: Just replaces this with:
-                // cursor.moveToLast();
-                // eventID = cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.EVENT_ID));
+            boolean eventFound = false;
+            if (instanceCursor.moveToFirst()) {
                 do {
+                    String id = instanceCursor.getString(instanceCursor.getColumnIndex(CalendarContract.Instances._ID));
+                    eventID = instanceCursor.getString(instanceCursor.getColumnIndex(CalendarContract.Instances.EVENT_ID));
+                    long begin = Long.parseLong(instanceCursor.getString(instanceCursor.getColumnIndex(CalendarContract.Instances.BEGIN)));
                     if (D)
-                        Log.i(TAG, "Data: " + cursor.getString(0) + " " + cursor.getString(1) + " " + cursor.getString(2) + " " + cursor.getString(3) + " " + cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.EVENT_ID)));
-                    eventID = cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.EVENT_ID));
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
+                        Log.i(TAG, "Data: " + id + " " + eventID + " " + begin + " " + instanceCursor.getString(instanceCursor.getColumnIndex(CalendarContract.Instances.END)));
 
-            if (!eventID.isEmpty()) {
+                    Cursor reminderCursor = CalendarContract.Reminders.query(cr, Long.parseLong(eventID), reminderProj);
+                    if (reminderCursor.moveToFirst()) {
+                        do {
+                            long offset = Long.parseLong(reminderCursor.getString(reminderCursor.getColumnIndex(CalendarContract.Reminders.MINUTES))) * 60 * 1000; // Get reminder offset and convert to milliseconds
+                            if (D)
+                                Log.i(TAG, "Begin: " + begin + " Offset: " + offset + " AlarmTime: " + alarmTime);
+                            if (begin - offset == alarmTime) { // Calculate alarm time from the begin time and minutes and compare with alarmTime to make 100% sure that it's the right event
+                                eventFound = true;
+                                if (D)
+                                    Log.i(TAG, "Event found!");
+                            }
+                        } while (!eventFound && reminderCursor.moveToNext());
+                    }
+                    reminderCursor.close();
+                } while (!eventFound && instanceCursor.moveToNext());
+            }
+            instanceCursor.close();
+
+            if (eventFound) { // If the event is found, then open up the calendar
                 uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, Long.parseLong(eventID));
-                intent = new Intent(Intent.ACTION_VIEW)
-                        .setData(uri);
+                intent = new Intent(Intent.ACTION_VIEW).setData(uri);
                 context.startActivity(intent);
             }
         }
