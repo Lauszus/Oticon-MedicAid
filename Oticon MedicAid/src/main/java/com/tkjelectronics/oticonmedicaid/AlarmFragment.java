@@ -15,6 +15,10 @@ public class AlarmFragment extends Fragment {
     TextView mTextView;
     boolean alarmFlag;
 
+    public AlarmFragment() {
+        this(false);
+    }
+
     public AlarmFragment(boolean alarmFlag) {
         this.alarmFlag = alarmFlag;
     }
