@@ -69,10 +69,6 @@ public class CalendarReminderReceiver extends BroadcastReceiver {
             instanceCursor.close();
 
             if (eventFound) { // If the event is found, then open up the calendar
-                /*uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, Long.parseLong(eventID));
-                intent = new Intent(Intent.ACTION_VIEW).setData(uri);
-                context.startActivity(intent);*/
-
                 Intent actIntent = new Intent();
                 actIntent.setClassName(context.getPackageName(), context.getPackageName() + '.' + MedicAidActivity.class.getSimpleName());
                 actIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);

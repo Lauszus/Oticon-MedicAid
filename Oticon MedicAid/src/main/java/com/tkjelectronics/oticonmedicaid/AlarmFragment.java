@@ -36,8 +36,6 @@ public class AlarmFragment extends Fragment {
         if (alarmFlag) {
             mTextView.setVisibility(View.VISIBLE);
             dismissBtn.setText(getString(R.string.dismiss));
-            /*AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
-            audioManager.requestAudioFocus((MedicAidActivity) getActivity(), AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);*/
             ((MedicAidActivity) getActivity()).startMediaPlayer();
         } else
             mTextView.setVisibility(View.GONE);
