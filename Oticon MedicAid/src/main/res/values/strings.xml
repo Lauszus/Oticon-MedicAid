@@ -2,12 +2,14 @@
 <resources>
 
     <string name="app_name">Oticon MedicAid</string>
-    <string name="title_section1">Reminders</string>
-    <string name="title_section2">Calendar</string>
+    <string name="reminders_title">Reminders</string>
+    <string name="calendar_title">Calendar</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
-    <string name="button">Dismiss</string>
+    <string name="buttonDefault">No notifications</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="takePill">It\'s time to take your pill</string>
 
 </resources>

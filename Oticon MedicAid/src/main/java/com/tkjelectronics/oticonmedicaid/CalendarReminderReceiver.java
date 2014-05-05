@@ -2,7 +2,6 @@ package com.tkjelectronics.oticonmedicaid;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,6 +12,12 @@ import android.util.Log;
 public class CalendarReminderReceiver extends BroadcastReceiver {
     private static final String TAG = "CalendarReminderReceiver";
     public static final boolean D = MedicAidActivity.D; // This is automatically set when building
+
+    private MedicAidActivity mMedicAidActivity;
+
+    public CalendarReminderReceiver(MedicAidActivity mMedicAidActivity) {
+        this.mMedicAidActivity = mMedicAidActivity;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -70,9 +75,15 @@ public class CalendarReminderReceiver extends BroadcastReceiver {
             instanceCursor.close();
 
             if (eventFound) { // If the event is found, then open up the calendar
-                uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, Long.parseLong(eventID));
+                /*uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, Long.parseLong(eventID));
                 intent = new Intent(Intent.ACTION_VIEW).setData(uri);
-                context.startActivity(intent);
+                context.startActivity(intent);*/
+
+                Intent actIntent = new Intent();
+                actIntent.setClassName(context.getPackageName(), context.getPackageName() + '.' + MedicAidActivity.class.getSimpleName());
+                actIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
+                actIntent.putExtra(MedicAidActivity.EXTRA_ALARM, true);
+                context.startActivity(actIntent);
             }
         }
     }

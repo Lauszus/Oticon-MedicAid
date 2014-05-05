@@ -102,8 +102,8 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
+                        getString(R.string.reminders_title),
+                        getString(R.string.calendar_title),
                 }
         ));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
@@ -189,16 +189,17 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     private void selectItem(int position) {
-        mCurrentSelectedPosition = position;
-        if (mDrawerListView != null) {
-            mDrawerListView.setItemChecked(position, true);
-        }
-        if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(mFragmentContainerView);
-        }
-        if (mCallbacks != null) {
+        setFocus(position);
+        if (mCallbacks != null)
             mCallbacks.onNavigationDrawerItemSelected(position);
-        }
+    }
+
+    public void setFocus(int position) {
+        mCurrentSelectedPosition = position;
+        if (mDrawerListView != null)
+            mDrawerListView.setItemChecked(position, true);
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawer(mFragmentContainerView);
     }
 
     @Override

@@ -1,26 +1,25 @@
 package com.tkjelectronics.oticonmedicaid;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 
 public class MedicAidActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private static final String TAG = "MedicAidActivity";
     public static final boolean D = BuildConfig.DEBUG; // This is automatically set when building
+
+    public static final String EXTRA_ALARM = "ALARM";
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -32,11 +31,16 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
      */
     private CharSequence mTitle;
 
-    private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver();
+    private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver(this);
+
+    AlarmFragment mAlarmFragment;
+    CalendarFragment mCalendarFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (D)
+            Log.d(TAG, "---- onCreate ----");
         setContentView(R.layout.activity_medic_aid);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -50,8 +54,25 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (D)
+            Log.d(TAG, "---- onDestroy ----");
+        boolean alarmFlag = intent.getBooleanExtra(EXTRA_ALARM, false);
+
+        if (D)
+            Log.i(TAG, "Alarm flag: " + alarmFlag);
+        if (alarmFlag) {
+            replaceFragment(0, true);
+            mNavigationDrawerFragment.setFocus(0);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (D)
+            Log.d(TAG, "---- onDestroy ----");
         unregisterReceiver(mCalendarReminderReceiver);
     }
 
@@ -73,31 +94,26 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        if (position == 1) {
-            CalendarFragment mCalendarView = new CalendarFragment();
-
-
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, mCalendarView)
-                    .commit();
-            onSectionAttached(1);
-        } else {
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, PlaceholderFragment.newInstance(position))
-                    .commit();
-        }
+        // Update the main content by replacing fragments
+        replaceFragment(position, false);
     }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 0:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 1:
-                mTitle = getString(R.string.title_section2);
-                break;
+    private void replaceFragment(int position, boolean alarmFlag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (position == 0) {
+            mTitle = getString(R.string.reminders_title);
+            if (mAlarmFragment == null || alarmFlag)
+                mAlarmFragment = new AlarmFragment(alarmFlag);
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, mAlarmFragment, mTitle.toString())
+                    .commit();
+        } else if (position == 1) {
+            mTitle = getString(R.string.calendar_title);
+            if (mCalendarFragment == null)
+                mCalendarFragment = new CalendarFragment();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, mCalendarFragment, mTitle.toString())
+                    .commit();
         }
     }
 
@@ -131,40 +147,5 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         if (id == R.id.action_settings)
             return true;
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.fragment_medic_aid, container, false);
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MedicAidActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
-        }
     }
 }
