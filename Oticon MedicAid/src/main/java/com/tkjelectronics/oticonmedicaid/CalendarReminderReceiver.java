@@ -70,7 +70,8 @@ public class CalendarReminderReceiver extends BroadcastReceiver {
 
             if (eventFound) { // If the event is found, then open up the calendar
                 Intent actIntent = new Intent();
-                actIntent.setClassName(context.getPackageName(), context.getPackageName() + '.' + MedicAidActivity.class.getSimpleName());
+                String packageName = "com.tkjelectronics.oticonmedicaid";
+                actIntent.setClassName(packageName, packageName + '.' + MedicAidActivity.class.getSimpleName());
                 actIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
                 actIntent.putExtra(MedicAidActivity.EXTRA_ALARM, true);
                 context.startActivity(actIntent);
