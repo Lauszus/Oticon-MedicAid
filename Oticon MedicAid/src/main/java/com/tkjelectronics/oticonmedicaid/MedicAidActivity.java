@@ -64,7 +64,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (D)
-            Log.d(TAG, "---- onDestroy ----");
+            Log.d(TAG, "---- onNewIntent ----");
         boolean alarmFlag = intent.getBooleanExtra(EXTRA_ALARM, false);
 
         if (D)
