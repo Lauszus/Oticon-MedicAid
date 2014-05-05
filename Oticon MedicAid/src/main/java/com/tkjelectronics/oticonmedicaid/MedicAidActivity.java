@@ -1,10 +1,15 @@
 package com.tkjelectronics.oticonmedicaid;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -15,7 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MedicAidActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public class MedicAidActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "MedicAidActivity";
     public static final boolean D = BuildConfig.DEBUG; // This is automatically set when building
 
@@ -33,8 +38,10 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
 
     private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver();
 
-    AlarmFragment mAlarmFragment;
-    CalendarFragment mCalendarFragment;
+    private MediaPlayer mMediaPlayer;
+
+    private AlarmFragment mAlarmFragment;
+    private CalendarFragment mCalendarFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +80,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         super.onDestroy();
         if (D)
             Log.d(TAG, "---- onDestroy ----");
+        stopMediaPlayer();
         unregisterReceiver(mCalendarReminderReceiver);
     }
 
@@ -147,5 +155,25 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         if (id == R.id.action_settings)
             return true;
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onAudioFocusChange(int focusChange) {
+        if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.sounds_882_solemn);
+            mMediaPlayer.setVolume(1.0f, 1.0f);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.start(); // No need to call prepare(); create() does that for you
+            mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+        } else
+            stopMediaPlayer();
+    }
+
+    public void stopMediaPlayer() {
+        if (mMediaPlayer != null) {
+            if (mMediaPlayer.isPlaying())
+                mMediaPlayer.stop();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
     }
 }

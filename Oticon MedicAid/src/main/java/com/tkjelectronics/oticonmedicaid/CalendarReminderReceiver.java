@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class CalendarReminderReceiver extends BroadcastReceiver {
     private static final String TAG = "CalendarReminderReceiver";
-    public static final boolean D = MedicAidActivity.D; // This is automatically set when building
+    public static final boolean D = false && MedicAidActivity.D; // This is automatically set when building
 
     @Override
     public void onReceive(Context context, Intent intent) {

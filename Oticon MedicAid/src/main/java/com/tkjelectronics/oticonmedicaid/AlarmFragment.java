@@ -1,5 +1,7 @@
 package com.tkjelectronics.oticonmedicaid;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -33,6 +35,7 @@ public class AlarmFragment extends Fragment {
                 mTextView.setVisibility(View.GONE);
                 dismissBtn.setText(getString(R.string.buttonDefault));
                 alarmFlag = false;
+                ((MedicAidActivity) getActivity()).stopMediaPlayer();
             }
         });
         mTextView = (TextView) view.findViewById(R.id.reminderText);
@@ -48,5 +51,13 @@ public class AlarmFragment extends Fragment {
     private void setAlarm() {
         mTextView.setVisibility(View.VISIBLE);
         dismissBtn.setText(getString(R.string.dismiss));
+
+        AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+        int result = audioManager.requestAudioFocus(((MedicAidActivity) getActivity()), AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+/*
+        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            // Could not get audio focus.
+        }
+*/
     }
 }
