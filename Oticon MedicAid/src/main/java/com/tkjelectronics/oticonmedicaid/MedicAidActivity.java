@@ -31,7 +31,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
      */
     private CharSequence mTitle;
 
-    private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver(this);
+    private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver();
 
     AlarmFragment mAlarmFragment;
     CalendarFragment mCalendarFragment;

@@ -13,12 +13,6 @@ public class CalendarReminderReceiver extends BroadcastReceiver {
     private static final String TAG = "CalendarReminderReceiver";
     public static final boolean D = MedicAidActivity.D; // This is automatically set when building
 
-    private MedicAidActivity mMedicAidActivity;
-
-    public CalendarReminderReceiver(MedicAidActivity mMedicAidActivity) {
-        this.mMedicAidActivity = mMedicAidActivity;
-    }
-
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction() != null && intent.getAction().equalsIgnoreCase(CalendarContract.ACTION_EVENT_REMINDER)) {
@@ -31,22 +25,22 @@ public class CalendarReminderReceiver extends BroadcastReceiver {
             if (D)
                 Log.i(TAG, "URI: " + uri.toString() + " " + alarmTime);
 
-            String[] instanceProj = new String[]{
+            String[] instanceProjection = new String[]{
                     CalendarContract.Instances._ID,
                     CalendarContract.Instances.BEGIN,
                     CalendarContract.Instances.END,
                     CalendarContract.Instances.EVENT_ID,
             };
-            String[] reminderProj = new String[]{
+            String[] reminderProjection = new String[]{
                     CalendarContract.Reminders.EVENT_ID,
                     CalendarContract.Reminders.MINUTES,
                     CalendarContract.Reminders.METHOD,
             };
 
             ContentResolver cr = context.getContentResolver();
-            Cursor instanceCursor = CalendarContract.Instances.query(cr, instanceProj, alarmTime - 12 * 60 * 60 * 1000, alarmTime + 12 * 60 * 60 * 1000); // Search for event from 12 hour before and after alarm time
+            Cursor instanceCursor = CalendarContract.Instances.query(cr, instanceProjection, alarmTime - 12 * 60 * 60 * 1000, alarmTime + 12 * 60 * 60 * 1000); // Search for event from 12 hour before and after alarm time
 
-            String eventID = "";
+            String eventID;
             boolean eventFound = false;
             if (instanceCursor.moveToFirst()) {
                 do {
@@ -56,7 +50,7 @@ public class CalendarReminderReceiver extends BroadcastReceiver {
                     if (D)
                         Log.i(TAG, "Data: " + id + " " + eventID + " " + begin + " " + instanceCursor.getString(instanceCursor.getColumnIndex(CalendarContract.Instances.END)));
 
-                    Cursor reminderCursor = CalendarContract.Reminders.query(cr, Long.parseLong(eventID), reminderProj);
+                    Cursor reminderCursor = CalendarContract.Reminders.query(cr, Long.parseLong(eventID), reminderProjection);
                     if (reminderCursor.moveToFirst()) {
                         do {
                             long offset = Long.parseLong(reminderCursor.getString(reminderCursor.getColumnIndex(CalendarContract.Reminders.MINUTES))) * 60 * 1000; // Get reminder offset and convert to milliseconds
