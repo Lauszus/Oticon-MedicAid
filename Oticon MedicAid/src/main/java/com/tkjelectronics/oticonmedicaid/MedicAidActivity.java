@@ -65,7 +65,9 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         registerReceiver(mCalendarReminderReceiver, filter);
     }
 
-    public void startMediaPlayer() {
+    public void requestAudioFocus() {
+        if (D)
+            Log.d(TAG, "---- requestAudioFocus ----");
         //playerPosition = pos;
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -201,7 +203,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
     }
 
     public void onAudioFocusChange(int focusChange) {
-        if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+        if (focusChange == AudioManager.AUDIOFOCUS_GAIN) { // We just gained audio focus
             //showNotification(notificationID);
 
             mMediaPlayer = MediaPlayer.create(this, R.raw.sounds_882_solemn);
@@ -211,8 +213,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
                 mMediaPlayer.seekTo(playerPosition);*/
             mMediaPlayer.start(); // No need to call prepare(); create() does that for you
             mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-        } else
-            stopMediaPlayer();
+        }
     }
 /*
     private void showNotification(int id) {
