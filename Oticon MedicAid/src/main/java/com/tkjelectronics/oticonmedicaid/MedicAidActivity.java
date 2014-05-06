@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 
 // TODO: Dismiss notification using button and make notification
 public class MedicAidActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, AudioManager.OnAudioFocusChangeListener {
@@ -154,18 +153,18 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
     private void replaceFragment(int position, boolean alarmFlag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (position == REMINDER_FRAGMENT) {
-            mTitle = getString(R.string.reminders_title);
+            mTitle = getString(R.string.home_title);
             if (mAlarmFragment == null || alarmFlag)
                 mAlarmFragment = new AlarmFragment(alarmFlag);
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, mAlarmFragment, mTitle.toString())
+                    .replace(R.id.container, mAlarmFragment, getString(R.string.home_title))
                     .commit();
         } else if (position == CALENDAR_FRAGMENT) {
             mTitle = getString(R.string.calendar_title);
             if (mCalendarFragment == null)
                 mCalendarFragment = new CalendarFragment();
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, mCalendarFragment, mTitle.toString())
+                    .replace(R.id.container, mCalendarFragment, getString(R.string.calendar_title))
                     .commit();
         }
     }
@@ -184,22 +183,10 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.medic_aid, menu);
             restoreActionBar();
             return true;
         }
         return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings)
-            return true;
-        return super.onOptionsItemSelected(item);
     }
 
     public void onAudioFocusChange(int focusChange) {
