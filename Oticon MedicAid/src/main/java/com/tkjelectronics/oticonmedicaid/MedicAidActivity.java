@@ -1,3 +1,15 @@
+/*************************************************************************************
+ * Copyright (C) 2014 Kristian Lauszus, TKJ Electronics. All rights reserved.
+ *
+ * Contact information
+ * -------------------
+ *
+ * Kristian Lauszus, TKJ Electronics
+ * Web      :  http://www.tkjelectronics.com
+ * e-mail   :  kristianl@tkjelectronics.com
+ *
+ ************************************************************************************/
+
 package com.tkjelectronics.oticonmedicaid;
 
 import android.app.AlertDialog;
