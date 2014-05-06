@@ -17,13 +17,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 
-// TODO: Dismiss notification using button and make notification
+// TODO: Finish custom notification and dismiss calendar notification using button
 public class MedicAidActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "MedicAidActivity";
     public static final boolean D = BuildConfig.DEBUG; // This is automatically set when building
 
     public static final String EXTRA_ALARM = "ALARM";
-    //public static final String EXTRA_PLAYER_POS = "PLAYER_POS";
 
     public static final int REMINDER_FRAGMENT = 0;
     public static final int CALENDAR_FRAGMENT = 1;
@@ -41,7 +40,6 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
     private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver();
 
     private MediaPlayer mMediaPlayer;
-    //private int playerPosition = 0; // Zero by default
     //private static final int notificationID = 0;
 
     private AlarmFragment mAlarmFragment;
@@ -67,41 +65,10 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
     public void requestAudioFocus() {
         if (D)
             Log.d(TAG, "---- requestAudioFocus ----");
-        //playerPosition = pos;
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
     }
 
-/*
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (D)
-            Log.d(TAG, "---- onRestoreInstanceState ----");
-
-        int pos = savedInstanceState.getInt(EXTRA_PLAYER_POS, -1);
-        if (pos != -1) {
-            if (D)
-                Log.i(TAG, "Restoring MediaPlayer");
-            startMediaPlayer(pos); // Restore last player position
-            restoreAlarmFragment(); // Restore the fragment as well
-        } else if (D)
-            Log.i(TAG, "DO NOT Restoring MediaPlayer");
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (D)
-            Log.d(TAG, "---- onSaveInstanceState ----");
-
-        if (mMediaPlayer != null && mMediaPlayer.isPlaying())
-            playerPosition = mMediaPlayer.getCurrentPosition();
-        else
-            playerPosition = -1;
-        outState.putInt(EXTRA_PLAYER_POS, playerPosition);
-    }
-*/
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -196,8 +163,6 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
             mMediaPlayer = MediaPlayer.create(this, R.raw.sounds_882_solemn);
             mMediaPlayer.setVolume(1.0f, 1.0f);
             mMediaPlayer.setLooping(true);
-            /*if (playerPosition > 0)
-                mMediaPlayer.seekTo(playerPosition);*/
             mMediaPlayer.start(); // No need to call prepare(); create() does that for you
             mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         }
