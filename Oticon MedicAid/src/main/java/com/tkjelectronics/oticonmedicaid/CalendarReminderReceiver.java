@@ -25,13 +25,13 @@ public class CalendarReminderReceiver extends BroadcastReceiver {
             if (D)
                 Log.i(TAG, "URI: " + uri.toString() + " " + alarmTime);
 
-            String[] instanceProjection = new String[]{
+            String[] instanceProjection = new String[]{ // Projection used when looking for the event
                     CalendarContract.Instances._ID,
                     CalendarContract.Instances.BEGIN,
                     CalendarContract.Instances.END,
                     CalendarContract.Instances.EVENT_ID,
             };
-            String[] reminderProjection = new String[]{
+            String[] reminderProjection = new String[]{ // Projection used for looking for the reminder
                     CalendarContract.Reminders.EVENT_ID,
                     CalendarContract.Reminders.MINUTES,
                     CalendarContract.Reminders.METHOD,

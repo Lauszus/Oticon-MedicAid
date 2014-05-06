@@ -27,24 +27,24 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
     public static final int REMINDER_FRAGMENT = 0;
     public static final int CALENDAR_FRAGMENT = 1;
 
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
+    /** Fragment managing the behaviors, interactions and presentation of the navigation drawer. */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
+    /** Used to store the last screen title. For use in {@link #restoreActionBar()}. */
     private CharSequence mTitle;
 
+    /** Used for receiving calendar events. */
     private CalendarReminderReceiver mCalendarReminderReceiver = new CalendarReminderReceiver();
 
+    /** MediaPlayer instance used to play the notification sound. */
     private MediaPlayer mMediaPlayer;
     //private static final int notificationID = 0;
 
+    /** The two fragments. */
     private AlarmFragment mAlarmFragment;
     private CalendarFragment mCalendarFragment;
 
+    /** Called when the activity is created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +52,8 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
             Log.d(TAG, "---- onCreate ----");
         setContentView(R.layout.activity_medic_aid);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer); // Init navigationDrawer Fragment
+        mTitle = getTitle(); // Get app title
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
@@ -62,18 +62,13 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         registerReceiver(mCalendarReminderReceiver, filter);
     }
 
-    public void requestAudioFocus() {
-        if (D)
-            Log.d(TAG, "---- requestAudioFocus ----");
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-    }
-
+    /** Called when the application is launched by an intent. */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (D)
             Log.d(TAG, "---- onNewIntent ----");
+
         boolean alarmFlag = intent.getBooleanExtra(EXTRA_ALARM, false);
 
         if (D)
@@ -82,11 +77,13 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
             restoreAlarmFragment();
     }
 
+    /** Used to set the alarm to true and select the alarm fragment. */
     private void restoreAlarmFragment() {
         replaceFragment(REMINDER_FRAGMENT, true);
         mNavigationDrawerFragment.setFocus(REMINDER_FRAGMENT);
     }
 
+    /** Called when the activity is destroyed. */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -96,6 +93,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         unregisterReceiver(mCalendarReminderReceiver);
     }
 
+    /** Used to show a dialog, asking the user if he is sure that he wants to exit the application. */
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
@@ -112,30 +110,37 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
                 .create().show();
     }
 
+    /** Called when a item in the NavigationDrawer is selected. */
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         replaceFragment(position, false); // Update the main content by replacing fragments
     }
 
+    /**
+     * Used to show a new fragment.
+     * @param position  The position in the NavigationDrawer.
+     * @param alarmFlag Set this to true if the alarm is on.
+     */
     private void replaceFragment(int position, boolean alarmFlag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (position == REMINDER_FRAGMENT) {
             mTitle = getString(R.string.home_title);
             if (mAlarmFragment == null || alarmFlag)
-                mAlarmFragment = new AlarmFragment(alarmFlag);
+                mAlarmFragment = new AlarmFragment(alarmFlag); // Create new instance if it's null or the alarmFlag is set
             fragmentManager.beginTransaction()
                     .replace(R.id.container, mAlarmFragment, getString(R.string.home_title))
                     .commit();
         } else if (position == CALENDAR_FRAGMENT) {
             mTitle = getString(R.string.calendar_title);
             if (mCalendarFragment == null)
-                mCalendarFragment = new CalendarFragment();
+                mCalendarFragment = new CalendarFragment(); // Create new instance if it's null
             fragmentManager.beginTransaction()
                     .replace(R.id.container, mCalendarFragment, getString(R.string.calendar_title))
                     .commit();
         }
     }
 
+    /** Used to restore the default ActionBar. */
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -143,19 +148,26 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         actionBar.setTitle(mTitle);
     }
 
-
+    /** Called when the ActionBar menu is created. */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
+            // Only show items in the action bar relevant to this screen if the drawer is not showing. Otherwise, let the drawer decide what to show in the action bar.
             restoreActionBar();
             return true;
         }
         return super.onCreateOptionsMenu(menu);
     }
 
+    /** Requests audio focus. {@link #onAudioFocusChange(int focusChange)} is called when focus has changed. */
+    public void requestAudioFocus() {
+        if (D)
+            Log.d(TAG, "---- requestAudioFocus ----");
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+    }
+
+    /** Called when the audio focus has changed. */
     public void onAudioFocusChange(int focusChange) {
         if (focusChange == AudioManager.AUDIOFOCUS_GAIN) { // We just gained audio focus
             //showNotification(notificationID);
@@ -164,7 +176,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
             mMediaPlayer.setVolume(1.0f, 1.0f);
             mMediaPlayer.setLooping(true);
             mMediaPlayer.start(); // No need to call prepare(); create() does that for you
-            mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+            mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK); // Make sure the audio is played even if the phone is locked
         }
     }
 /*
@@ -200,6 +212,7 @@ public class MedicAidActivity extends ActionBarActivity implements NavigationDra
         mNotificationManager.cancel(id); // Hide notification
     }
 */
+    /** Used to stop and release the MediaPlayer instance. */
     public void stopMediaPlayer() {
         if (mMediaPlayer != null) {
             if (mMediaPlayer.isPlaying())

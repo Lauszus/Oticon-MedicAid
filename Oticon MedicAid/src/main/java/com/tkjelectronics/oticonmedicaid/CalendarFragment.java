@@ -31,6 +31,10 @@ public class CalendarFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Open a calendar at a particular day.
+     * @param startMillis   The time of the day in milliseconds since epoch.
+     */
     public void openCalender(long startMillis) {
         Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
         builder.appendPath("time");

@@ -13,10 +13,15 @@ public class AlarmFragment extends Fragment {
     TextView mTextView;
     boolean alarmFlag;
 
+    /** Default constructor. */
     public AlarmFragment() {
         this(false);
     }
 
+    /**
+     * Constructor.
+     * @param alarmFlag Set this to true if the alarm is on.
+     */
     public AlarmFragment(boolean alarmFlag) {
         this.alarmFlag = alarmFlag;
     }
@@ -34,16 +39,16 @@ public class AlarmFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (alarmFlag) {
-            mTextView.setVisibility(View.VISIBLE);
+            mTextView.setVisibility(View.VISIBLE); // If alarmFlag is set, then show text
             dismissBtn.setText(getString(R.string.dismiss));
             ((MedicAidActivity) getActivity()).requestAudioFocus();
         } else
-            mTextView.setVisibility(View.GONE);
+            mTextView.setVisibility(View.GONE); // Hide text
 
         dismissBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTextView.setVisibility(View.GONE);
+                mTextView.setVisibility(View.GONE); // Hide text
                 dismissBtn.setText(getString(R.string.buttonDefault));
                 alarmFlag = false;
                 ((MedicAidActivity) getActivity()).stopMediaPlayer();
